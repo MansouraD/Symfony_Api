@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\OperationsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -30,9 +32,14 @@ class Operations
     private $montant;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Comptes::class)
+     * @ORM\ManyToMany(targetEntity=Comptes::class)
      */
     private $comptes;
+
+    public function __construct()
+    {
+        $this->comptes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -63,14 +70,28 @@ class Operations
         return $this;
     }
 
-    public function getComptes(): ?Comptes
+    /**
+     * @return Collection|Comptes[]
+     */
+    public function getComptes(): Collection
     {
         return $this->comptes;
     }
 
-    public function setComptes(?Comptes $comptes): self
+    public function addCompte(Comptes $compte): self
     {
-        $this->comptes = $comptes;
+        if (!$this->comptes->contains($compte)) {
+            $this->comptes[] = $compte;
+        }
+
+        return $this;
+    }
+
+    public function removeCompte(Comptes $compte): self
+    {
+        if ($this->comptes->contains($compte)) {
+            $this->comptes->removeElement($compte);
+        }
 
         return $this;
     }
